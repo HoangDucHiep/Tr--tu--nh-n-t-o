@@ -12,32 +12,42 @@
     <div class="main-container">
         <div class="matrix-container">
             <div class="start-matrix matrix">
-                <input class="cell" type="text" id="m1-0-0">
-                <input class="cell" type="text" id="m1-0-1">
-                <input class="cell" type="text" id="m1-0-2">
-                <input class="cell" type="text" id="m1-1-0">
-                <input class="cell" type="text" id="m1-1-1">
-                <input class="cell" type="text" id="m1-1-2">
-                <input class="cell" type="text" id="m1-2-0">
-                <input class="cell" type="text" id="m1-2-1">
-                <input class="cell" type="text" id="m1-2-2">
+                <input class="cell" type="text" id="m1-0-0" value="1">
+                <input class="cell" type="text" id="m1-0-1" value="2">
+                <input class="cell" type="text" id="m1-0-2" value="3">
+                <input class="cell" type="text" id="m1-1-0" value="4">
+                <input class="cell" type="text" id="m1-1-1" value="5">
+                <input class="cell" type="text" id="m1-1-2" value="6">
+                <input class="cell" type="text" id="m1-2-0" value="7">
+                <input class="cell" type="text" id="m1-2-1" value="8">
+                <input class="cell" type="text" id="m1-2-2" value="0">
             </div>
 
             <div class="final-matrix matrix">
-                <input class="cell" type="text" id="m2-0-0">
-                <input class="cell" type="text" id="m2-0-1">
-                <input class="cell" type="text" id="m2-0-2">
-                <input class="cell" type="text" id="m2-1-0">
-                <input class="cell" type="text" id="m2-1-1">
-                <input class="cell" type="text" id="m2-1-2">
-                <input class="cell" type="text" id="m2-2-0">
-                <input class="cell" type="text" id="m2-2-1">
-                <input class="cell" type="text" id="m2-2-2">
+                <input class="cell" type="text" id="m2-0-0" value="1">
+                <input class="cell" type="text" id="m2-0-1" value="2">
+                <input class="cell" type="text" id="m2-0-2" value="3">
+                <input class="cell" type="text" id="m2-1-0" value="4">
+                <input class="cell" type="text" id="m2-1-1" value="5">
+                <input class="cell" type="text" id="m2-1-2" value="6">
+                <input class="cell" type="text" id="m2-2-0" value="7">
+                <input class="cell" type="text" id="m2-2-1" value="0">
+                <input class="cell" type="text" id="m2-2-2" value="8">
             </div>
-            
-            <button type="button" id="solve-btn">Solve</button>
         </div>
-        <canvas id="canvas" width="3500" height="2000"></canvas>
+        <div class="control">
+            <button type="button" id="random" class="btn">Random start</button>
+            <button type="button" id="shuffle" class="btn">Shuffle final</button>
+        </div>
+        <div class="control">
+            <button type="button" id="solve" class="btn">Solve</button>
+            <button type="button" id="reset" class="btn">Reset</button>
+        </div>
+        <div class="result">
+            <button>prev</button>
+            <div class="matrix"></div>
+            <button>next</button>
+        </div>
     </div>
     
 

@@ -85,74 +85,104 @@ class Node {
     }
 }
 
-
-function solvePuzzle(startMatrix, emptyX, emptyY, finalMatrix) {
-
-    if (!isSolvable(startMatrix, finalMatrix)) {
-        console.log("Unsolvable puzzle");
-        return null;
+class Solver {
+    constructor(startMatrix, emptyX, emptyY, finalMatrix) {
+        this.startMatrix = startMatrix;
+        this.emptyX = emptyX;
+        this.emptyY = emptyY;
+        this.finalMatrix = finalMatrix;
     }
 
-    const qp = []; //queue for dfs
-    const visited = new Set(); //visited nodes
+    getSolution() { 
+        let result = this.#solve();
 
-    const start = new Node(startMatrix, emptyX, emptyY, null, null);
-
-    qp.push(start);
-    
-    while (qp.length > 0) {
-        const cur = qp.shift();
-
-        if (cur.matrix.equals(finalMatrix)) {
-            return cur;
+        if (!result) { 
+            return null;
         }
 
-        visited.add(cur.matrix);
+        let moves = [];
 
-        const up = cur.doMove(Node.UP);
-        const down = cur.doMove(Node.DOWN);
-        const left = cur.doMove(Node.LEFT);
-        const right = cur.doMove(Node.RIGHT);
-
-        if (up && !visited.has(up.matrix)) {
-            qp.push(up);
+        while (result) {
+            moves.push(result);
+            result = result.parent;
         }
 
-        if (down && !visited.has(down.matrix)) {
-            qp.push(down);
-        }
-
-        if (left && !visited.has(left.matrix)) {
-            qp.push(left);
-        }
-
-        if (right && !visited.has(right.matrix)) {
-            qp.push(right);
-        }
+        return moves.reverse();
     }
-}
 
-function isSolvable(start, final) {
-    let invCountStart = getInvCount(start);
-    let invCountFinal = getInvCount(final);
+    #solve() {
+        if (!this.#isSolvable(this.startMatrix, this.finalMatrix)) {
+            console.log("Unsolvable puzzle");
+            return null;
+        }
 
-    return invCountStart % 2 === invCountFinal % 2;
-}
+        const qp = []; //queue for dfs
+        const visited = new Set(); //visited nodes
 
-function getInvCount(matrix) {
-    let arr = matrix.flat();
-    let invCount = 0;
+        const start = new Node(this.startMatrix, this.emptyX, this.emptyY, null, null);
 
-    for (let i = 0; i < arr.length - 1; i++) {
-        for (let j = i + 1; j < arr.length; j++) {
-            if (arr[i] && arr[j] && arr[i] > arr[j]) {
-                invCount++;
+        qp.push(start);
+
+        while (qp.length > 0) {
+            const cur = qp.shift();
+
+            if (cur.matrix.equals(this.finalMatrix)) {
+                return cur;
+            }
+
+            visited.add(cur.matrix);
+
+            const up = cur.doMove(Node.UP);
+            const down = cur.doMove(Node.DOWN);
+            const left = cur.doMove(Node.LEFT);
+            const right = cur.doMove(Node.RIGHT);
+
+            if (up && !visited.has(up.matrix)) {
+                qp.push(up);
+            }
+
+            if (down && !visited.has(down.matrix)) {
+                qp.push(down);
+            }
+
+            if (left && !visited.has(left.matrix)) {
+                qp.push(left);
+            }
+
+            if (right && !visited.has(right.matrix)) {
+                qp.push(right);
             }
         }
     }
 
-    return invCount;
+    
+    #isSolvable(start, final) {
+        let invCountStart = this.#getInvCount(start);
+        let invCountFinal = this.#getInvCount(final);
+
+        return invCountStart % 2 === invCountFinal % 2;
+    }
+
+    #getInvCount(matrix) {
+        let arr = matrix.flat();
+        let invCount = 0;
+    
+        for (let i = 0; i < arr.length - 1; i++) {
+            for (let j = i + 1; j < arr.length; j++) {
+                if (arr[i] && arr[j] && arr[i] > arr[j]) {
+                    invCount++;
+                }
+            }
+        }
+    
+        return invCount;
+    }
 }
+
+
+
+
+
 
 
 let matrix = [
@@ -167,13 +197,11 @@ let finalState = [
     [5, 7, 4]
 ];
 
-let result = solvePuzzle(matrix, 1, 2, finalState);
+let solver = new Solver(matrix, 1, 2, finalState);
+let solution = solver.getSolution();
 
-let moves = [];
-
-while (result) {
-    moves.push(result.toString() + "\n");
-    result = result.parent;
+if (solution) {
+    console.log(solution.join("==========\n"));
 }
 
-console.log(moves.reverse().join(" "));
+//output

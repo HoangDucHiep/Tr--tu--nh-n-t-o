@@ -1,8 +1,9 @@
 .main-container {
+    margin: 0 0;
+    padding: 0 0;
     border: 1px solid blue;
-    width: 100%;
+    width: 700px;
     height: 95vh;
-    display: flex;
 }
 
 .cell {
@@ -14,9 +15,25 @@
 }
 
 .matrix-container {
+    border: 1px solid red;
     display: flex;
-    flex-direction: column;
-    margin-top: 20px;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.control {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid green;
+}
+
+#random {
+    margin-right: 200px;
+}
+
+#shuffle {
+
 }
 
 .matrix {
@@ -24,7 +41,7 @@
     grid-template-columns: repeat(3, 50px);
     grid-template-rows: repeat(3, 50px);
     gap: 5px;
-    margin-top: 50px;
+    margin-top: 40px;
     position: relative;
 }
 
@@ -47,8 +64,8 @@
 }
 
 
-#solve-btn {
-    margin-top: 50px;
+.btn {
+    margin-top: 20px;
     padding: 10px 20px;
     font-size: 20px;
     background-color: rgb(0, 0, 0);
@@ -56,14 +73,3 @@
     border: 1px solid red;
     cursor: pointer;
 }
-
-#canvas {
-    border: 1px solid black;
-    margin-top: 20px;
-    margin-left: 50px;
-}
-
-#zoom-controls {
-    margin-top: 20px;
-}
-
