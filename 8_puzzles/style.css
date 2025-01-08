@@ -1,0 +1,69 @@
+.main-container {
+    border: 1px solid blue;
+    width: 100%;
+    height: 95vh;
+    display: flex;
+}
+
+.cell {
+    border: 2px solid rgb(0, 0, 0);
+    width: 45px;
+    height: 45px;
+    text-align: center;
+    font-size: 20px;
+}
+
+.matrix-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+.matrix {
+    display: grid;
+    grid-template-columns: repeat(3, 50px);
+    grid-template-rows: repeat(3, 50px);
+    gap: 5px;
+    margin-top: 50px;
+    position: relative;
+}
+
+.start-matrix::after {
+    content: "Start Matrix";
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    position: absolute;
+    white-space: nowrap;
+    top: -30px;
+    transform: translateX(50%);
+}
+
+.final-matrix::after {
+    content: "Final Matrix";
+    font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    position: absolute;
+    white-space: nowrap;
+    top: -30px;
+    transform: translateX(50%);
+}
+
+
+#solve-btn {
+    margin-top: 50px;
+    padding: 10px 20px;
+    font-size: 20px;
+    background-color: rgb(0, 0, 0);
+    color: white;
+    border: 1px solid red;
+    cursor: pointer;
+}
+
+#canvas {
+    border: 1px solid black;
+    margin-top: 20px;
+    margin-left: 50px;
+}
+
+#zoom-controls {
+    margin-top: 20px;
+}
+

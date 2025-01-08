@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>8 puzzle</title>
+</head>
+
+<body>
+    <div class="main-container">
+        <div class="matrix-container">
+            <div class="start-matrix matrix">
+                <input class="cell" type="text" id="m1-0-0">
+                <input class="cell" type="text" id="m1-0-1">
+                <input class="cell" type="text" id="m1-0-2">
+                <input class="cell" type="text" id="m1-1-0">
+                <input class="cell" type="text" id="m1-1-1">
+                <input class="cell" type="text" id="m1-1-2">
+                <input class="cell" type="text" id="m1-2-0">
+                <input class="cell" type="text" id="m1-2-1">
+                <input class="cell" type="text" id="m1-2-2">
+            </div>
+
+            <div class="final-matrix matrix">
+                <input class="cell" type="text" id="m2-0-0">
+                <input class="cell" type="text" id="m2-0-1">
+                <input class="cell" type="text" id="m2-0-2">
+                <input class="cell" type="text" id="m2-1-0">
+                <input class="cell" type="text" id="m2-1-1">
+                <input class="cell" type="text" id="m2-1-2">
+                <input class="cell" type="text" id="m2-2-0">
+                <input class="cell" type="text" id="m2-2-1">
+                <input class="cell" type="text" id="m2-2-2">
+            </div>
+            
+            <button type="button" id="solve-btn">Solve</button>
+        </div>
+        <canvas id="canvas" width="3500" height="2000"></canvas>
+    </div>
+    
+
+    <script type="module" src="main.js"></script>
+</body>
+
+</html>
