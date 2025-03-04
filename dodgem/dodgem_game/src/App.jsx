@@ -3,6 +3,8 @@ import Board from './components/Board/Board';
 import { Game } from "./core/Game";
 import { Player } from "./core/Player";
 import './styles/App.css';
+import './styles/Game.css'
+import Setting from './components/Setting/Setting';
 
 const player1 = new Player('player1', false);
 const player2 = new Player('player2', false);
@@ -28,10 +30,22 @@ function App() {
     return game._isValidMove(piece, newPosition);
   }
 
+  game._printBoard();
+  console.log(game.desTiles);
+
   return (
-    <>
-      <Board board={board} onMove={handleMove} isValid={checkValidMove} />
-    </>
+    <div>
+      <h1 id='title'>Dodgem ProVjp Game</h1>
+      <div className='mainGameContainer'
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-around',
+        }}>
+        <Setting></Setting>
+        <Board board={board} onMove={handleMove} isValid={checkValidMove} />
+      </div>
+    </div>
   );
 }
 

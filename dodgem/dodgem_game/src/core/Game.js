@@ -5,6 +5,7 @@ class Game {
   constructor(player1, player2, boardSize = 3) {
     this.boardSize = boardSize;
     this.players = [player1, player2];
+    this.desTiles = {};
     this.currentPlayerIndex = 0;
     this.board = this._initializeBoard();
     this.history = [];
@@ -12,23 +13,30 @@ class Game {
     this.winnder = null;
   }
 
+  
+
   _initializeBoard() {
-    const board = Array.from({ length: this.boardSize }, () =>
-      Array(this.boardSize).fill(null)
+    const board = Array.from({ length: this.boardSize + 1 }, () =>
+      Array(this.boardSize + 1).fill(null)
     );
 
     const player1 = this.players[0];
     const player2 = this.players[1];
-    for (let i = 0; i < this.boardSize - 1; i++) {
+    
+    const player1Des = Array.from({ length: board.length - 1 }, (_, i) => ({ x: i + 1, y: board.length - 1 }));
+    const player2Des = Array.from({ length: board.length - 1 }, (_, i) => ({ x: 0, y: i }));
+
+    this.desTiles = [player1Des, player2Des]
+
+    for (let i = 1; i < this.boardSize; i++) {
       const newPiece1 = new Piece(`p1_${i}`, 'red', { x: i, y: 0 });
       board[i][0] = newPiece1;
       player1.pieces.push(newPiece1);
 
-      const newPiece2 = new Piece(`p2_${i}`,'blue', { x: this.boardSize - 1, y: i + 1 });
-      board[this.boardSize - 1][i + 1] = newPiece2;
+      const newPiece2 = new Piece(`p2_${i}`,'blue', { x: this.boardSize, y: i });
+      board[this.boardSize][i] = newPiece2;
       player2.pieces.push(newPiece2);
     }
-
     return board;
   }
 
@@ -40,7 +48,21 @@ class Game {
     this.board[newX][newY] = piece;
     piece.position = newPosition;
 
+    if (this._inDestinationTile(piece)) {
+      this.players[this.currentPlayerIndex].pieces = this.players[this.currentPlayerIndex].pieces.filter(p => p.id !== piece.id);
+      this.board[newX][newY] = null;
+      console.log(this.players[this.currentPlayerIndex].pieces);
+    }
+
+    if (this.players[this.currentPlayerIndex].pieces.length === 0) {
+      this.gameOver = true;
+      this.winnder = this.players[this.currentPlayerIndex];
+      console.log(`Player ${this.currentPlayerIndex + 1} wins!`);
+    }
+
+
     this.currentPlayerIndex = 1 - this.currentPlayerIndex;
+
 
   }
 
@@ -66,9 +88,9 @@ class Game {
     // check if new position is within the board
     if (
       newX < 0 ||
-      newX >= this.boardSize ||
+      newX >= this.boardSize + 1 ||
       newY < 0 ||
-      newY >= this.boardSize
+      newY >= this.boardSize + 1
     ) {
       return false;
     }
@@ -83,8 +105,20 @@ class Game {
       return false;
     }
 
+    // can't move to other players's destination tile
+    if (this.desTiles[1- this.currentPlayerIndex].findIndex((tile) => tile.x === newX && tile.y === newY) !== -1) {
+      return false;
+    }
+
     return true;
   }
+
+  _inDestinationTile(piece) {
+    const { x, y } = piece.position;
+    const desTile = this.desTiles[this.currentPlayerIndex];
+    return desTile.findIndex((tile) => tile.x === x && tile.y === y) !== -1;
+  }
+
 
   getPieceById(pieceId) {
     for (const player of this.players) {

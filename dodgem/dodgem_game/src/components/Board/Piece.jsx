@@ -16,8 +16,8 @@ const Piece = ({ color, position, id }) => {
       style={{
         opacity: isDragging ? 0.5 : 1,
         backgroundColor: color,
-        width: "90px",
-        height: "90px",
+        width: "90%",
+        height: "90%",
         borderRadius: "50%",
         cursor: "move",
       }}

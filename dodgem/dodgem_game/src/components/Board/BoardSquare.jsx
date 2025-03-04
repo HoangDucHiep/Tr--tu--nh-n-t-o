@@ -1,8 +1,9 @@
 import Square from "./Square";
 import { useDrop } from "react-dnd";
 import { ItemTypes } from "../../utils/Constants";
+import SquareMask from "./SquareMask";
 
-export default function BoardSquare({ x, y, onMove, isValid, children }) {
+export default function BoardSquare({ x, y, onMove, isValid, isDestination, isDimmed, children }) {
   const [{ isOver, canDrop }, drop] = useDrop(
     () => ({
       accept: ItemTypes.PIECE,
@@ -27,48 +28,25 @@ export default function BoardSquare({ x, y, onMove, isValid, children }) {
       style={{
         position: "relative",
         width: "100%",
-        height: "100%",
+          height: "100%",
+          backgroundColor: isDimmed ? "rgba(255, 0, 0, 0)" : "rgba(255, 255, 255, 0)",
       }}
     >
       <Square>{children}</Square>
 
+      {isDestination && (
+        <SquareMask color="rgba(102, 255, 117, 0.29)" />
+      )}
 
-      {isOver && !canDrop && <div
-          style={{
-            position: "absolute",
-            top: "5px",
-            left: "5px",
-            height: "98%",
-            width: "98%",
-            zIndex: 1,
-            opacity: 0.5,
-            backgroundColor: "red",
-          }}
-        />}
-      {!isOver && canDrop && <div
-          style={{
-            position: "absolute",
-            top: "5px",
-            left: "5px",
-            height: "98%",
-            width: "98%",
-            zIndex: 1,
-            opacity: 0.5,
-            backgroundColor: "yellow",
-          }}
-        />}
-      {isOver && canDrop && <div
-          style={{
-            position: "absolute",
-            top: "5px",
-            left: "5px",
-            height: "98%",
-            width: "98%",
-            zIndex: 1,
-            opacity: 0.5,
-            backgroundColor: "green",
-          }}
-        />}
+      {isOver && !canDrop && (
+        <SquareMask color="rgba(255, 0, 0, 0.86)" />
+      )}
+      {!isOver && canDrop && (
+        <SquareMask color="rgba(238, 255, 0, 0.82)" />
+      )}
+      {isOver && canDrop && (
+        <SquareMask color="rgba(0, 255, 26, 0.8)" />
+      )}
     </div>
   );
 }
