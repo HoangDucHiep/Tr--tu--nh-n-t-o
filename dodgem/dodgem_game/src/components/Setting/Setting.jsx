@@ -1,23 +1,6 @@
-import React, {useState} from 'react';
-
-const Setting = () => {
-  const [mode, setMode] = useState('PvC');
-  const [player1, setPlayer1] = useState('');
-  const [player2, setPlayer2] = useState('');
-  
-  const handleModeChange = (event) => {
-    setMode(event.target.value);
-  };
-
-  const handleNameInput = (event) => {
-    if (event.target.id === 'player1') {
-      setPlayer1(event.target.value);
-    } else {
-      setPlayer2(event.target.value);
-    }    
-  }
 
 
+const Setting = ({isPlaying, currentMode, onModeChange, onNameInput, onNewGameClick}) => {
   return (
     <div
       style={{
@@ -47,8 +30,9 @@ const Setting = () => {
             id="single"
             name="mode"
             value="PvC"
-            checked={mode === 'PvC'}
-            onChange={handleModeChange}
+            disabled={isPlaying}
+            checked={currentMode === 'PvC'}
+            onChange={onModeChange}
           />
           <label htmlFor="single" style={{marginRight: "0.9rem"}}>PvC</label>
 
@@ -57,25 +41,26 @@ const Setting = () => {
             id="multi"
             name="mode"
             value="PvP"
-            checked={mode === 'PvP'}
-            onChange={handleModeChange}
+            disabled={isPlaying}
+            checked={currentMode === 'PvP'}
+            onChange={onModeChange}
           />
           <label htmlFor="PvP">PvP</label>
         </div>
       </div>
 
       <div>
-        <label htmlFor="player1">{mode === 'PvP' ? "Player 1" : "Player"}</label>
-        <input type="text" id="player1" placeholder='Enter name' onChange={handleNameInput} />
+        <label htmlFor="player1">{currentMode === 'PvP' ? "Player 1" : "Player"}</label>
+        <input type="text" id="player1" placeholder='Enter name' onChange={onNameInput} disabled={isPlaying}/>
       </div>
-      {mode === 'PvP' && (
+      {currentMode === 'PvP' && (
         <div>
           <label htmlFor="player2">Player 2</label>
-          <input type="text" id="player2" placeholder='Enter name' onChange={handleNameInput}/>
+          <input type="text" id="player2" placeholder='Enter name' onChange={onNameInput} disabled={isPlaying}/>
         </div>
       )}
 
-      <button>Start Game</button>
+      <button onClick={onNewGameClick}>Start Game</button>
       <button>New Game</button>
     </div>
   );

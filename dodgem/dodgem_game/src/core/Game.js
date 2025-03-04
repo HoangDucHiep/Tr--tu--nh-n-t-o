@@ -10,10 +10,8 @@ class Game {
     this.board = this._initializeBoard();
     this.history = [];
     this.gameOver = false;
-    this.winnder = null;
+    this.winner = null;
   }
-
-  
 
   _initializeBoard() {
     const board = Array.from({ length: this.boardSize + 1 }, () =>
@@ -22,7 +20,7 @@ class Game {
 
     const player1 = this.players[0];
     const player2 = this.players[1];
-    
+
     const player1Des = Array.from({ length: board.length - 1 }, (_, i) => ({ x: i + 1, y: board.length - 1 }));
     const player2Des = Array.from({ length: board.length - 1 }, (_, i) => ({ x: 0, y: i }));
 
@@ -30,10 +28,12 @@ class Game {
 
     for (let i = 1; i < this.boardSize; i++) {
       const newPiece1 = new Piece(`p1_${i}`, 'red', { x: i, y: 0 });
+      newPiece1.owner = 0; // gán chủ sở hữu cho player 1
       board[i][0] = newPiece1;
       player1.pieces.push(newPiece1);
-
-      const newPiece2 = new Piece(`p2_${i}`,'blue', { x: this.boardSize, y: i });
+    
+      const newPiece2 = new Piece(`p2_${i}`, 'blue', { x: this.boardSize, y: i });
+      newPiece2.owner = 1; // gán chủ sở hữu cho player 2
       board[this.boardSize][i] = newPiece2;
       player2.pieces.push(newPiece2);
     }
@@ -49,28 +49,25 @@ class Game {
     piece.position = newPosition;
 
     if (this._inDestinationTile(piece)) {
-      this.players[this.currentPlayerIndex].pieces = this.players[this.currentPlayerIndex].pieces.filter(p => p.id !== piece.id);
+      this.players[piece.owner].pieces = this.players[piece.owner].pieces.filter(p => p.id !== piece.id);
       this.board[newX][newY] = null;
-      console.log(this.players[this.currentPlayerIndex].pieces);
+      console.log(this.players[piece.owner].pieces);
     }
 
     if (this.players[this.currentPlayerIndex].pieces.length === 0) {
       this.gameOver = true;
-      this.winnder = this.players[this.currentPlayerIndex];
+      this.winner = this.players[this.currentPlayerIndex];
       console.log(`Player ${this.currentPlayerIndex + 1} wins!`);
     }
 
-
     this.currentPlayerIndex = 1 - this.currentPlayerIndex;
-
-
   }
 
   _isValidMove(piece, newPosition) {
     const { x, y } = piece.position;
     const { x: newX, y: newY } = newPosition;
 
-    if (this.players[this.currentPlayerIndex].pieces.indexOf(piece) === -1) {
+    if (!this.players[this.currentPlayerIndex].pieces.some(p => p.id === piece.id)) {
       console.log("piece does not belong to the current player");
       return false;
     }
@@ -106,7 +103,7 @@ class Game {
     }
 
     // can't move to other players's destination tile
-    if (this.desTiles[1- this.currentPlayerIndex].findIndex((tile) => tile.x === newX && tile.y === newY) !== -1) {
+    if (this.desTiles[1 - this.currentPlayerIndex].findIndex((tile) => tile.x === newX && tile.y === newY) !== -1) {
       return false;
     }
 
@@ -115,10 +112,9 @@ class Game {
 
   _inDestinationTile(piece) {
     const { x, y } = piece.position;
-    const desTile = this.desTiles[this.currentPlayerIndex];
+    const desTile = this.desTiles[piece.owner]; // sử dụng owner thay vì currentPlayerIndex
     return desTile.findIndex((tile) => tile.x === x && tile.y === y) !== -1;
   }
-
 
   getPieceById(pieceId) {
     for (const player of this.players) {
@@ -130,12 +126,6 @@ class Game {
 
   // FOR TESTING ONLY
   _printBoard() {
-    /* 
-    X |  |  |
-    X |  |  |
-      | O | O
-    */
-
     console.log(
       this.board
         .map((row) => row.map((cell) => (cell ? cell.color : "_")).join(" | "))
@@ -144,27 +134,4 @@ class Game {
   }
 }
 
-// test
-/* const player1 = new Player([
-  new Piece(1, 'X'),
-  new Piece(2, 'X')
-], false);
-
-const player2 = new Player([
-  new Piece(3, 'O'),
-  new Piece(4, 'O')
-], false);
-
-const game = new Game(player1, player2);
-
-game._printBoard();
-console.log("\n-------------------\n");
-
-game._movePiece(player1.pieces[0], { x: 0, y: 1 });
-game._printBoard();
-
-console.log("\n-------------------\n");
-game._movePiece(player1.pieces[1], { x: 1, y: 1 });
-game._printBoard();
-*/
 export { Game };
