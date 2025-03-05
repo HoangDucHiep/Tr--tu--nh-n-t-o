@@ -5,7 +5,7 @@ import Tile from "./Tile";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
-const Board = ({ board, onMove, isValid }) => {
+const Board = ({ board, onMove, isValid, isCurrentPlayerPiece }) => {
   if (!board) {
     return <div>Loading board...</div>;
   }
@@ -56,6 +56,7 @@ const Board = ({ board, onMove, isValid }) => {
                   id={cell.id}
                   color={cell.color}
                   position={cell.position}
+                  canDrag={() => isCurrentPlayerPiece(cell.id)}
                 />
               )}
             </BoardTile>

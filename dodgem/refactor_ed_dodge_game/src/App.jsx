@@ -3,11 +3,12 @@ import './assets/styles/Board.css';
 import Board from './components/board/Board';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Game from "./core/Game";
 import Player from "./core/Player";
 import Setting from "./components/settings/Setting";  
 import HistoryBoard from './components/moveHistory/historyBoard';
+import PopUp from "./components/PopUp";
 
 function App() {
   // setting thinsg
@@ -16,6 +17,8 @@ function App() {
   const [gameSize, setGameSize] = useState(3);
   const [player1Name, setPlayer1Name] = useState("");
   const [player2Name, setPlayer2Name] = useState("");
+  const [isOver, setIsOver] = useState(false);
+  const [winner, setWinner] = useState(null);
 
   
   // game thinsg
@@ -38,8 +41,6 @@ function App() {
     setGameSize(Number(e.target.value));
   }
 
-  
-
   const onStartGame = () => {
     const p1Name = player1Name === "" ? "Player 1" : player1Name;
     const p2Name = player2Name === "" ? "Player 2" : player2Name;
@@ -55,47 +56,52 @@ function App() {
     }
 
     const player1 = new Player(p1Name);
-    const player2 = new Player(p2Name);
+    const player2 = new Player(p2Name, currentMode === "PvC");
 
     const newGame = new Game(gameSize);
     newGame.start(player1, player2);
     setIsPlaying(true);
     setGame(newGame);
     setBoard(newGame.board.map(row => [...row]));
+    setIsOver(false); // Reset trạng thái isOver khi bắt đầu trò chơi mới
+    setWinner(null); // Reset trạng thái winner khi bắt đầu trò chơi mới
   }
 
-
-
-
-/*   useEffect(() => {
-    const player1 = new Player("Player 1");
-    const player2 = new Player("Player 2");
-    const newGame = new Game(3);
-    newGame.start(player1, player2);
-    setGame(newGame);
-  }, []); */
-
-
-  const handleMove = (pieceId, newPosition) => {
+  const handleMove = async (pieceId, newPosition) => {
     if (game) {
       game.playTurn(pieceId, newPosition);
       setBoard(game.board.map(row => [...row]));
+      if (game.isOver) {
+        setIsOver(true);
+        setIsPlaying(false);
+        setWinner(game.players[game.winner].name);
+      } else if (game.players[game.currentPlayer].isAI) {
+        await game.aiMove();
+        if (game.isOver) {
+          setIsOver(true);
+          setIsPlaying(false);
+          setWinner(game.players[game.winner].name);
+        }
+        setBoard(game.board.map(row => [...row]));
+      }
     }
   };
 
-  if (game) {
-    game._displayBoard();
+  const onGameOver = () => { 
+    setGame(null);
+    setBoard(null);
+    setIsPlaying(false);
   }
 
-  console.log(isPlaying);
-  console.log(currentMode);
-  console.log(gameSize);
-  console.log(player1Name);
-  console.log(player2Name);
+
+  const isCurrentPlayerPiece = (pieceId) => {
+    return game.players[game.currentPlayer].pieces.find(p => p.id === pieceId);
+  }
+
 
   return (
     <div className="App">
-      <h1>Dodgem Provjp Max</h1>
+      <h1 className='game-name'>Dodgem Provjp Max</h1>
       <div className="flex-container">
         <div className="flex-item-1">
           <Setting
@@ -113,6 +119,7 @@ function App() {
               board={board}
               onMove={handleMove}
               isValid={(id, position) => game.validateMove(id, position)}
+              isCurrentPlayerPiece={isCurrentPlayerPiece}
             /> : <div>Settings and click Start Game first</div>}
           </DndProvider>
         </div>
@@ -120,6 +127,14 @@ function App() {
           <HistoryBoard/>
         </div>
       </div>
+      {game && isOver &&
+        <PopUp
+          open={isOver}
+          title={"Game Over"}
+        content={`The winner is ${winner}!!!`}
+        onClick={() => onGameOver()}
+        />}
+      
     </div>
   );
 }

@@ -3,10 +3,10 @@ const SquareMask = ({ color }) => {
     <div
           style={{
             position: "absolute",
-            top: "5.5px",
-            left: "5.5px",
-            height: "98.5%",
-            width: "98.5%",
+            top: "5%",
+            left: "5%",
+            height: "90%",
+            width: "90%",
             zIndex: 1,
             opacity: 0.3,
             backgroundColor: color,

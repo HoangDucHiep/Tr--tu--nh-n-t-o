@@ -108,8 +108,8 @@ const Setting = ({
       )}
 
       <div style={styles.buttonGroup}>
-        <button onClick={onNewGameClick}>Start Game</button>
-        <button>New Game</button>
+        <button onClick={onNewGameClick} disabled={isPlaying}>Start Game</button>
+        <button >New Game</button >
       </div>
     </div>
   );

@@ -55,9 +55,43 @@ export default class Game {
       console.log(`Player ${this.players[this.winner].name} wins!`);
     }
 
-
     this.currentPlayer = this.currentPlayer === PLAYER1 ? PLAYER2 : PLAYER1;
     return true;
+  }
+
+  aiMove() {
+    return new Promise((resolve) => {
+      if (this.isOver) return resolve(false);
+  
+      const pieces = this.players[this.currentPlayer].pieces;
+      const validMoves = [];
+  
+      pieces.forEach(piece => {
+        const { x, y } = piece.position;
+        const possibleMoves = [
+          { x: x - 1, y }, // up
+          { x: x + 1, y }, // down
+          { x, y: y - 1 }, // left
+          { x, y: y + 1 }  // right
+        ];
+  
+        possibleMoves.forEach(move => {
+          if (this.validateMove(piece.id, move)) {
+            validMoves.push({ pieceId: piece.id, newPosition: move });
+          }
+        });
+      });
+  
+      if (validMoves.length > 0) {
+        const randomMove = validMoves[Math.floor(Math.random() * validMoves.length)];
+        setTimeout(() => {
+          this.playTurn(randomMove.pieceId, randomMove.newPosition);
+          resolve(true);
+        }, 100); // Delay 100ms for AI move
+      } else {
+        resolve(false);
+      }
+    });
   }
 
   validateMove(pieceId, newPosition) {
@@ -128,6 +162,8 @@ export default class Game {
 
     return true;
   }
+
+  
 
   #isInDestinationTile(piece) {
     const playerId = piece.player;

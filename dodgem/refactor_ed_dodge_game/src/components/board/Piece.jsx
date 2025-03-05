@@ -1,13 +1,14 @@
 import { ItemTypes } from "../../utils/Constants";
 import { useDrag } from "react-dnd";
 
-const Piece = ({ color, position, id }) => {
+const Piece = ({ color, position, id, canDrag }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemTypes.PIECE,
     item: { id, position }, // Truyền id và position để xác định quân cờ
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
+    canDrag: canDrag,
   }));
 
   return (
