@@ -67,6 +67,9 @@ export class MinimaxSolver {
   evaluate(game) {
     let score = 0;
 
+    const BLOCK_BONUS = 15 * this.gameSize;
+    const INDIRECT_BLOCK_BONUS = 10 * this.gameSize;
+
     game.player2.pieces.forEach((piece) => {
       score += this.AIEvalMatrix[piece.position.x][piece.position.y];
     });
@@ -79,23 +82,23 @@ export class MinimaxSolver {
       const { x: xP, y: yP } = personPiece.position;
 
       const playerBlockAi = { x: xP, y: yP - 1 };
-      const playerRelativeBlockAi = { x: xP, y: yP - 2 };
+      const playerIndirectBlockAi = { x: xP, y: yP - 2 };
 
       const AiBlockPlayer = { x: xP - 1, y: yP };
-      const AiRelativeBlockPlayer = { x: xP - 2, y: yP };
+      const AiIndirectBlockPlayer = { x: xP - 2, y: yP };
 
       if (game._isInBoard({ x: playerBlockAi.x, y: playerBlockAi.y })) {
         game.player2.pieces.find((piece) => {
           if (piece.position.x === playerBlockAi.x && piece.position.y === playerBlockAi.y) {
-            score -= 40;
+            score -= BLOCK_BONUS;
           }
         });
       }
 
-      if (game._isInBoard({ x: playerRelativeBlockAi.x, y: playerRelativeBlockAi.y })) {
+      if (game._isInBoard({ x: playerIndirectBlockAi.x, y: playerIndirectBlockAi.y })) {
         game.player2.pieces.find((piece) => {
-          if (piece.position.x === playerRelativeBlockAi.x && piece.position.y === playerRelativeBlockAi.y) {
-            score -= 30;
+          if (piece.position.x === playerIndirectBlockAi.x && piece.position.y === playerIndirectBlockAi.y) {
+            score -= INDIRECT_BLOCK_BONUS;
           }
         });
       }
@@ -103,15 +106,15 @@ export class MinimaxSolver {
       if (game._isInBoard({ x: AiBlockPlayer.x, y: AiBlockPlayer.y })) {
         game.player1.pieces.find((piece) => {
           if (piece.position.x === AiBlockPlayer.x && piece.position.y === AiBlockPlayer.y) {
-            score += 40;
+            score += BLOCK_BONUS;
           }
         });
       }
 
-      if (game._isInBoard({ x: AiRelativeBlockPlayer.x, y: AiRelativeBlockPlayer.y })) {
+      if (game._isInBoard({ x: AiIndirectBlockPlayer.x, y: AiIndirectBlockPlayer.y })) {
         game.player1.pieces.find((piece) => {
-          if (piece.position.x === AiRelativeBlockPlayer.x && piece.position.y === AiRelativeBlockPlayer.y) {
-            score += 30;
+          if (piece.position.x === AiIndirectBlockPlayer.x && piece.position.y === AiIndirectBlockPlayer.y) {
+            score += INDIRECT_BLOCK_BONUS;
           }
         });
       }
@@ -122,35 +125,35 @@ export class MinimaxSolver {
 }
 
 export function aiMatrixGenerator(size) {
-  const matrix = [];
+  const matrix = Array(size).fill(null).map(() => Array(size).fill(5 * (size - 1) * size));
+  const buffer = 5 * (size - 1);
 
-  const buffer = 5 * size;
-
-  for (let i = 1; i <= size; i++) {
-    const row = [];
-    const baseNumber = (size - i) * 5;
-    for (let j = 0; j < size; j++) {
-      row.push(baseNumber + j * buffer);
+  for (let i = 1; i < size; i++) {
+    const baseNumber = (size - i - 1) * 5;
+    for (let j = 0; j < size - 1; j++) {
+      matrix[i][j] = baseNumber + j * buffer;
     }
-    matrix.push(row);
   }
-
   return matrix;
 }
 
 export function personEvalMatrix(size) {
-  const matrix = [];
+  const matrix = Array(size).fill(null).map(() => Array(size).fill(-5 * (size - 1) * size));
+  const buffer = 5 * (size - 1);
 
-  const buffer = 5 * size;
-
-  for (let i = 1; i <= size; i++) {
-    const row = [];
-    const baseNumber = (size - i) * buffer;
-    for (let j = 0; j < size; j++) {
-      row.push(-baseNumber - j * 5);
+  for (let i = 1; i < size; i++) {
+    const baseNumber = (size - i - 1) * buffer;
+    for (let j = 0; j < size - 1; j++) {
+      matrix[i][j] = -baseNumber -j * 5;
     }
-    matrix.push(row);
   }
 
   return matrix;
 }
+
+console.log(personEvalMatrix(4));
+console.log(aiMatrixGenerator(4));
+
+
+console.log(personEvalMatrix(5));
+console.log(aiMatrixGenerator(5));
