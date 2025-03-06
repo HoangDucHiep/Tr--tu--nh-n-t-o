@@ -28,6 +28,7 @@ export class MinimaxSolver {
     let bestMove = null;
     let bestVal = -Infinity;
 
+    //const moves = game.getCurrentValidMoves();
     const moves = this._currentValidMovesEvaled(game);
 
     let alpha = -Infinity;
@@ -115,7 +116,7 @@ export class MinimaxSolver {
       score += this.personEvalMatrix[piece.position.x][piece.position.y];
     });
     
-    const BLOCK_BONUS = (i) =>  4 * (this.gameSize - i) * (this.gameSize - 2); // so for 4x4 board (or 3x3 game), 5 * 4 * 2 = 40
+    const BLOCK_BONUS = (i) =>  5 * (this.gameSize - i) * (this.gameSize - 2); // so for 4x4 board (or 3x3 game), 5 * 4 * 2 = 40
     
     game.player1.pieces.forEach((personPiece) => {
       const { x: xP, y: yP } = personPiece.position;
@@ -144,7 +145,7 @@ export class MinimaxSolver {
 export function aiMatrixGenerator(size) {
   const matrix = Array(size)
     .fill(null)
-    .map(() => Array(size).fill(200));
+    .map(() => Array(size).fill(400 * size));
   const buffer = 5 * (size - 1);
 
   for (let i = 1; i < size; i++) {
@@ -159,7 +160,7 @@ export function aiMatrixGenerator(size) {
 export function personEvalMatrix(size) {
   const matrix = Array(size)
     .fill(null)
-    .map(() => Array(size).fill(200));
+    .map(() => Array(size).fill(-400 * size));
   const buffer = 5 * (size - 1);
 
   for (let i = 1; i < size; i++) {
