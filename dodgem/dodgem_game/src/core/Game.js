@@ -1,6 +1,8 @@
 import { Piece } from "./Piece.js";
 import { Player } from "./Player.js";
 
+
+
 class Game {
   constructor(player1, player2, boardSize = 3) {
     this.boardSize = boardSize;

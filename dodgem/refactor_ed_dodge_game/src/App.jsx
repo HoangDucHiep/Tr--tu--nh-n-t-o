@@ -69,8 +69,9 @@ function App() {
 
   const handleMove = async (pieceId, newPosition) => {
     if (game) {
-      game.playTurn(pieceId, newPosition);
+      game.put(pieceId, newPosition);
       setBoard(game.board.map(row => [...row]));
+      
       if (game.isOver) {
         setIsOver(true);
         setIsPlaying(false);

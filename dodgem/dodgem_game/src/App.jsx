@@ -77,7 +77,12 @@ function App() {
           onNewGameClick={createNewGame}
         ></Setting>
         <div>
-          <Board board={board} onMove={handleMove} isValid={checkValidMove} />
+          <Board
+            board={board}
+            onMove={handleMove}
+            isValid={checkValidMove}
+            
+          />
 
             <div
               style={{

@@ -5,4 +5,14 @@ export default class Piece {
     this.player = playerId;
     this.position = position;
   }
+
+  clone() {
+    return new Piece(this.color, this.player, { ...this.position });
+  }
+
+  sameIdClone() {
+    const newPiece = new Piece(this.color, this.player, { ...this.position });
+    newPiece.id = this.id;
+    return newPiece;
+  }
 }

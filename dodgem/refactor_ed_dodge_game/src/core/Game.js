@@ -1,3 +1,4 @@
+import MinimaxSolver from "./AIMinimaxSolver.js";
 import Piece from "./Piece.js";
 
 import Player from "./Player.js";
@@ -8,11 +9,22 @@ export const PLAYER1_COLOR = "red";
 export const PLAYER2_COLOR = "blue";
 
 export default class Game {
+  static AI_MOVES = [
+    { x: -1, y: 0 },
+    { x: 1, y: 0 },
+    { x: 0, y: 1 },
+  ];
+
+  static PLAYER_MOVES = [
+    { x: -1, y: 0 },
+    { x: 0, y: 1 },
+    { x: 0, y: -1 },
+  ];
+
   constructor(size) {
     this.id = `game-${Date.now()}`;
     this.gameSize = size;
     this.boardSize = size + 1;
-    this.id = `game-${Date.now()}`;
     this.players = [];
     this.board = Array.from({ length: this.boardSize }, () =>
       Array(this.boardSize).fill(null)
@@ -25,9 +37,12 @@ export default class Game {
   start(player1, player2) {
     this.players = [player1, player2];
     this.#initializeBoard();
+    if (player2.isAI) {
+      this.aiSolver = new MinimaxSolver(this, 5);
+    }
   }
 
-  playTurn(pieceId, newPosition) { 
+  playTurn(pieceId, newPosition) {
     if (this.isOver) return false;
 
     if (!this.validateMove(pieceId, newPosition)) return false;
@@ -44,15 +59,12 @@ export default class Game {
       this.players[this.currentPlayer].pieces = this.players[
         this.currentPlayer
       ].pieces.filter((p) => p.id !== pieceId);
-      console.log("Piece reached destination");
-      console.log(this.players[this.currentPlayer].pieces);
       this.board[piece.position.x][piece.position.y] = null;
     }
 
     if (this.players[this.currentPlayer].pieces.length === 0) {
       this.isOver = true;
       this.winner = this.currentPlayer;
-      console.log(`Player ${this.players[this.winner].name} wins!`);
     }
 
     this.currentPlayer = this.currentPlayer === PLAYER1 ? PLAYER2 : PLAYER1;
@@ -62,35 +74,12 @@ export default class Game {
   aiMove() {
     return new Promise((resolve) => {
       if (this.isOver) return resolve(false);
-  
-      const pieces = this.players[this.currentPlayer].pieces;
-      const validMoves = [];
-  
-      pieces.forEach(piece => {
-        const { x, y } = piece.position;
-        const possibleMoves = [
-          { x: x - 1, y }, // up
-          { x: x + 1, y }, // down
-          { x, y: y - 1 }, // left
-          { x, y: y + 1 }  // right
-        ];
-  
-        possibleMoves.forEach(move => {
-          if (this.validateMove(piece.id, move)) {
-            validMoves.push({ pieceId: piece.id, newPosition: move });
-          }
-        });
-      });
-  
-      if (validMoves.length > 0) {
-        const randomMove = validMoves[Math.floor(Math.random() * validMoves.length)];
-        setTimeout(() => {
-          this.playTurn(randomMove.pieceId, randomMove.newPosition);
-          resolve(true);
-        }, 100); // Delay 100ms for AI move
-      } else {
-        resolve(false);
-      }
+
+      const randomMove = this.aiSolver.getBestMove();
+      setTimeout(() => {
+        this.playTurn(randomMove.pieceId, randomMove.move);
+        resolve(true);
+      }, 100); // Delay 100ms for AI move
     });
   }
 
@@ -99,7 +88,6 @@ export default class Game {
       (p) => p.id === pieceId
     );
     if (!piece) {
-      console.log("Piece not found");
       return false;
     }
 
@@ -113,40 +101,34 @@ export default class Game {
       newY < 0 ||
       newY >= this.boardSize
     ) {
-      console.log("Invalid move, out of board");
       return false;
     }
 
     // check if the new position is empty
     if (this.board[newX][newY]) {
-      console.log("Invalid move, position is not empty");
       return false;
     }
 
     // move only one step
     if (Math.abs(x - newX) > 1 || Math.abs(y - newY) > 1) {
-      console.log("Invalid move, can only move one step");
       return false;
     }
 
     // check to ensure no cross move
     if (Math.abs(x - newX) * Math.abs(y - newY) !== 0) {
-      console.log("Invalid move, can only move in one direction");
       return false;
     }
-    
 
     // check if the new position is not the other player's destination
-    const otherPlayerDes = this.currentPlayer === PLAYER1 ? this.player2Des : this.player1Des;
+    const otherPlayerDes =
+      this.currentPlayer === PLAYER1 ? this.player2Des : this.player1Des;
     if (otherPlayerDes.some((des) => des.x === newX && des.y === newY)) {
-      console.log("You can't move to the other player's destination");
       return false;
     }
 
     // for player1, can only move up, left, right
     if (this.currentPlayer === PLAYER1) {
       if (newX > x) {
-        console.log("Invalid move, can only move up");
         return false;
       }
     }
@@ -154,21 +136,20 @@ export default class Game {
     // for player2, can only move right, up, down
     if (this.currentPlayer === PLAYER2) {
       if (newY < y) {
-        console.log("Invalid move, can only move right");
         return false;
       }
     }
 
-
     return true;
   }
 
-  
-
   #isInDestinationTile(piece) {
     const playerId = piece.player;
-    const destination = this.players[PLAYER1].id === playerId ? this.player1Des : this.player2Des;
-    return destination.some((des) => des.x === piece.position.x && des.y === piece.position.y);
+    const destination =
+      this.players[PLAYER1].id === playerId ? this.player1Des : this.player2Des;
+    return destination.some(
+      (des) => des.x === piece.position.x && des.y === piece.position.y
+    );
   }
 
   #initializeBoard() {
@@ -206,8 +187,48 @@ export default class Game {
         .join("\n")
     );
   }
-}
 
+  clone() {
+    const newGame = new Game(this.gameSize);
+    newGame.players = this.players.map((player) => player.clone());
+    
+    newGame.board = this.board.map((
+      row => {
+        return row.map((cell) => {
+          if (cell) {
+            return cell.clone();
+          }
+          return null;
+        });
+      }
+    ));
+
+    return newGame;
+
+
+  }
+
+  sameIdClone() {
+    const newGame = new Game(this.gameSize);
+    newGame.players = this.players.map((player) => player.sameIdClone());
+    newGame.board = this.board.map((row) => {
+      return row.map((cell) => {
+        if (cell) {
+          return cell.sameIdClone();
+        }
+        return null;
+      });
+    });
+
+    newGame.id = this.id;
+    newGame.currentPlayer = this.currentPlayer;
+    newGame.winner = this.winner;
+    newGame.isOver = this.isOver;
+    newGame.player1Des = this.player1Des;
+    newGame.player2Des = this.player2Des;
+    return newGame;
+  }
+}
 
 /* let game = new Game(3);
 let player1 = new Player("player1");
