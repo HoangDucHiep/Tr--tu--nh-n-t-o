@@ -31,7 +31,7 @@ export default class Game {
     }
 
     if (player2.isAI) {
-      this.AISolver = new MinimaxSolver(this.boardSize, 6);
+      this.AISolver = new MinimaxSolver(this.boardSize, 7);
     }
 
     this.currentPlayer = player1;
@@ -115,7 +115,7 @@ export default class Game {
 
   move(pieceId, move) {
     if (this.isOver) {
-      console.log("Game is over");
+      //console.log("Game is over");
       return;
     }
 
@@ -136,7 +136,7 @@ export default class Game {
       const emptyDes = des.find((d) => this.board[d.x][d.y] === null);
 
       if (!emptyDes) {
-        console.log("No empty destination");
+        //console.log("No empty destination");
         return false;
       }
 
@@ -169,7 +169,7 @@ export default class Game {
 
   put(pieceId, newX, newY) {
     if (this.isOver) {
-      console.log("Game is over");
+      //console.log("Game is over");
       return;
     }
 
@@ -186,7 +186,7 @@ export default class Game {
       const emptyDes = des.find((d) => this.board[d.x][d.y] === null);
 
       if (!emptyDes) {
-        console.log("No empty destination");
+        //console.log("No empty destination");
         return false;
       }
 
@@ -223,17 +223,17 @@ export default class Game {
   validateMove(pieceId, move) {
     const piece = this.currentPlayer.pieces.find((p) => p.id === pieceId);
     if (!piece) {
-      console.log("Invalid piece");
+      //console.log("Invalid piece");
       return false;
     }
 
     if (!this._isCurrentPLayerMove(move)) {
-      console.log("Invalid move");
+      //console.log("Invalid move");
       return false;
     }
 
     if (this._isPieceReachDestination(piece)) {
-      console.log("Piece already reached destination");
+      //console.log("Piece already reached destination");
       return false;
     }
 
@@ -243,7 +243,7 @@ export default class Game {
     };
 
     if (!this._isInBoard(newX, newY)) {
-      console.log("Out of board");
+      //console.log("Out of board");
       return false;
     }
 
@@ -251,12 +251,12 @@ export default class Game {
       !this._isEmptyTile(newX, newY) &&
       !this._isDestinationTile(newX, newY, this.currentPlayer)
     ) {
-      console.log("Destination is not empty");
+      //console.log("Destination is not empty");
       return false;
     }
 
     if (!this._isOneStepMove(piece.position.x, piece.position.y, newX, newY)) {
-      console.log("Invalid move");
+      //console.log("Invalid move");
       return false;
     }
 
@@ -268,7 +268,7 @@ export default class Game {
         this.currentPlayer === this.player1 ? this.player2 : this.player1
       )
     ) {
-      console.log("Can't move to opponent's destination");
+      //console.log("Can't move to opponent's destination");
       return false;
     }
 
@@ -278,7 +278,7 @@ export default class Game {
   validateNewTile(pieceId, newX, newY) {
     const piece = this.currentPlayer.pieces.find((p) => p.id === pieceId);
     if (!piece) {
-      console.log("Invalid piece");
+      //console.log("Invalid piece");
       return false;
     }
 
@@ -288,17 +288,17 @@ export default class Game {
         y: newY - piece.position.y,
       })
     ) {
-      console.log("Invalid move");
+      //console.log("Invalid move");
       return false;
     }
 
     if (this._isPieceReachDestination(piece)) {
-      console.log("Piece already reached destination");
+      //console.log("Piece already reached destination");
       return false;
     }
 
     if (!this._isInBoard(newX, newY)) {
-      console.log("Out of board");
+      //console.log("Out of board");
       return false;
     }
 
@@ -306,12 +306,12 @@ export default class Game {
       !this._isEmptyTile(newX, newY) &&
       !this._isDestinationTile(newX, newY, this.currentPlayer)
     ) {
-      console.log("Destination is not empty");
+      //console.log("Destination is not empty");
       return false;
     }
 
     if (!this._isOneStepMove(piece.position.x, piece.position.y, newX, newY)) {
-      console.log("Invalid move");
+      //console.log("Invalid move");
       return false;
     }
 
@@ -323,7 +323,7 @@ export default class Game {
         this.currentPlayer === this.player1 ? this.player2 : this.player1
       )
     ) {
-      console.log("Can't move to opponent's destination");
+      //console.log("Can't move to opponent's destination");
       return false;
     }
 
