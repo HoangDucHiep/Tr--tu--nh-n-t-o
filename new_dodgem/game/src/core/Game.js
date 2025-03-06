@@ -31,7 +31,7 @@ export default class Game {
     }
 
     if (player2.isAI) {
-      this.AISolver = new MinimaxSolver(this.boardSize, 6);
+      this.AISolver = new MinimaxSolver(this.boardSize, 5);
     }
 
     this.currentPlayer = player1;
