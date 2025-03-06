@@ -1,6 +1,5 @@
 import { MinimaxSolver } from "./AIMinimaxSolver.js";
 import Piece from "./Piece.js";
-import Player from "./Player.js";
 
 export class GameMove {
   static Up = { x: -1, y: 0 };
