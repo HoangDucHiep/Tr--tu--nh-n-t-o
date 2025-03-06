@@ -9,8 +9,10 @@ import HistoryBoard from "./components/HistoryBoard";
 import { useState } from "react";
 import "./styles/App.css";
 import "./styles/Board.css";
-import Player from "./core/Player";
+import Player from "./core/PLayer.js";
 import Game from "./core/Game";
+
+import waitingGif from "./assert/gif/waiting.gif"; // with import
 
 function App() {
   // setting thinsg
@@ -25,13 +27,13 @@ function App() {
   const [game, setGame] = useState(null);
   const [board, setBoard] = useState(null);
 
-  
-  
+  const [isAIPlaying, setIsAIPlaying] = useState(false);
+
   // funtions
 
   const onModeChange = (e) => {
     setCurrentMode(e.target.value);
-  }
+  };
 
   const onNameInput = (e) => {
     if (e.target.id === "player1") {
@@ -39,16 +41,16 @@ function App() {
     } else {
       setPlayer2Name(e.target.value);
     }
-  }
+  };
 
   const onSizeChange = (e) => {
     setGameSize(Number(e.target.value));
-  }
+  };
 
   const onStartGame = () => {
     let p1Name;
     let p2Name;
-    
+
     if (currentMode === "PvP") {
       p1Name = player1Name || "Player 1";
       p2Name = player2Name || "Player 2";
@@ -58,7 +60,7 @@ function App() {
     }
     setPlayer1Name(p1Name);
     setPlayer2Name(p2Name);
-    
+
     const player1 = new Player(p1Name);
     const player2 = new Player(p2Name, currentMode === "PvC");
 
@@ -69,7 +71,7 @@ function App() {
     setIsPlaying(true);
     setIsOver(false);
     setWinner(null);
-  }
+  };
 
   const onNewGame = () => {
     setGame(null);
@@ -77,13 +79,13 @@ function App() {
     setIsPlaying(false);
     setIsOver(false);
     setWinner(null);
-  }
+  };
 
   const handleMove = async (pieceId, newPosition) => {
     if (game.isOver) return;
 
     game.put(pieceId, newPosition.x, newPosition.y);
-    setBoard(game.board.map(row => [...row]));
+    setBoard(game.board.map((row) => [...row]));
 
     if (game.isOver) {
       setIsOver(true);
@@ -92,8 +94,10 @@ function App() {
     }
 
     if (game.currentPlayer.isAI) {
+      setIsAIPlaying(true);
       await game.AIMove();
-      setBoard(game.board.map(row => [...row]));
+      setIsAIPlaying(false);
+      setBoard(game.board.map((row) => [...row]));
 
       if (game.isOver) {
         setIsOver(true);
@@ -103,21 +107,19 @@ function App() {
     }
   };
 
-  const onGameOver = () => { 
+  const onGameOver = () => {
     setGame(null);
     setBoard(null);
     setIsPlaying(false);
-  }
-
+  };
 
   const isCurrentPlayerPiece = (pieceId) => {
-    return game.currentPlayer.pieces.find(p => p.id === pieceId);
-  }
-
+    return game.currentPlayer.pieces.find((p) => p.id === pieceId);
+  };
 
   return (
     <div className="App">
-      <h1 className='game-name'>Dodgem Provjp Max</h1>
+      <h1 className="game-name">Dodgem Provjp Max</h1>
       <div className="flex-container">
         <div className="flex-item-1">
           <Setting
@@ -125,33 +127,45 @@ function App() {
             currentMode={currentMode}
             onModeChange={onModeChange}
             onNameInput={onNameInput}
-            onStartGameClick={onStartGame} 
+            onStartGameClick={onStartGame}
             onNewGameClick={onNewGame}
             onChangeSize={onSizeChange}
           />
         </div>
         <div className="flex-item-2">
-          <DndProvider backend={HTML5Backend}>
-            {game ? <Board
-              board={board}
-              onMove={handleMove}
-              isValid={(id, x, y) => game.validateNewTile(id, x, y)}
-              isCurrentPlayerPiece={isCurrentPlayerPiece}
-            /> : <div>Settings and click Start Game first</div>}
-          </DndProvider>
+          <div>
+            <DndProvider backend={HTML5Backend}>
+              {game ? (
+                <Board
+                  board={board}
+                  onMove={handleMove}
+                  isValid={(id, x, y) => game.validateNewTile(id, x, y)}
+                  isCurrentPlayerPiece={isCurrentPlayerPiece}
+                />
+              ) : (
+                <div>Settings and click Start Game first</div>
+              )}
+            </DndProvider>
+            {isPlaying && isAIPlaying && (
+              <div style={{ textAlign: "center" }}>
+                <img src={waitingGif} width={100} height={100} />
+                <p>Computer is playing ...</p>
+              </div>
+            )}
+          </div>
         </div>
         <div className="flex-item-3">
-          <HistoryBoard/>
+          <HistoryBoard />
         </div>
       </div>
-      {game && isOver &&
+      {game && isOver && (
         <PopUp
           open={isOver}
           title={"Game Over"}
-        content={`The winner is ${winner}!!!`}
-        onClick={() => onGameOver()}
-        />}
-      
+          content={`The winner is ${winner}!!!`}
+          onClick={() => onGameOver()}
+        />
+      )}
     </div>
   );
 }
