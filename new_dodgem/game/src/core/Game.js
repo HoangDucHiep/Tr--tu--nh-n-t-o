@@ -31,7 +31,7 @@ export default class Game {
     }
 
     if (player2.isAI) {
-      this.AISolver = new MinimaxSolver(this.boardSize, 5);
+      this.AISolver = new MinimaxSolver(this.boardSize, 6);
     }
 
     this.currentPlayer = player1;
@@ -39,20 +39,6 @@ export default class Game {
     this.isOver = false;
   }
 
-  // use for human player
-  playTurn(pieceId, move) {
-    if (this.isOver) return;
-
-    if (!this.validateMove(pieceId, move)) return;
-
-    this.move(pieceId, move);
-
-    if (this.isOver) {
-      console.log(`${this.winner.name} won the game`);
-    }
-
-    this._displayBoard();
-  }
 
   _initializeBoard() {
     for (let i = 1; i < this.gameSize; i++) {
@@ -112,6 +98,14 @@ export default class Game {
     return new Promise((resolve) => {
       setTimeout(() => {
         const move = this.AISolver.getBestMove(this);
+
+        if (move === null) {
+          this.isOver = true;
+          this.winner = this.currentPlayer === this.player1 ? this.player2 : this.player1;
+          resolve();
+          return;
+        }
+
         this.move(move.pieceId, move.move);
         this._displayBoard();
         resolve();
@@ -164,6 +158,13 @@ export default class Game {
 
     this.currentPlayer =
       this.currentPlayer === this.player1 ? this.player2 : this.player1;
+    
+    if (this.getCurrentValidMoves().length === 0) {
+      this.isOver = true;
+      this.winner =
+        this.currentPlayer === this.player1 ? this.player2 : this.player1;
+    }
+
   }
 
   put(pieceId, newX, newY) {
