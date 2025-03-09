@@ -3,30 +3,35 @@ import Player from "./Player.js";
 
 import { GameMove } from "./Game.js";
 
-export class MinimaxSolver {
-  constructor(gameSize, depth) {
-    this.gameSize = gameSize;
+export default class MinimaxSolver {
+  constructor(boardSize, depth) {
+    this.boardSize = boardSize;
     this.depth = depth;
 
-    this.AIEvalMatrix = aiMatrixGenerator(gameSize);
-    this.personEvalMatrix = personEvalMatrix(gameSize);
+    this.AIEvalMatrix = aiMatrixGenerator(boardSize);
+    this.personEvalMatrix = personEvalMatrix(boardSize);
   }
 
   _currentValidMovesEvaled(game) {
     const moves = game.getCurrentValidMoves();
     moves.sort((a, b) => {
-      const cloneA = game.getSameIdClone();
-      cloneA.move(a.pieceId, a.move);
-      const evalA = this.evaluate(cloneA);
-
-      const cloneB = game.getSameIdClone();
-      cloneB.move(b.pieceId, b.move);
-      const evalB = this.evaluate(cloneB);
-
-      return evalB - evalA;
+      const pieceA = game.currentPlayer.pieces.find(p => p.id === a.pieceId);
+      const pieceB = game.currentPlayer.pieces.find(p => p.id === b.pieceId);
+      const destA = this._getDestinationDistance(pieceA, game);
+      const destB = this._getDestinationDistance(pieceB, game);
+      return destA - destB;
     });
-
     return moves;
+  }
+
+  _getDestinationDistance(piece, game) {
+    const dest = game.currentPlayer === game.player2 ? game.player2Des : game.player1Des;
+    let minDistance = Infinity;
+    for (const d of dest) {
+      const distance = Math.abs(piece.x - d.x) + Math.abs(piece.y - d.y);
+      if (distance < minDistance) minDistance = distance;
+    }
+    return minDistance;
   }
 
   getBestMove(game) {
@@ -36,16 +41,16 @@ export class MinimaxSolver {
     let bestMove = null;
     let bestVal = -Infinity;
 
-    //const moves = game.getCurrentValidMoves();
     const moves = this._currentValidMovesEvaled(game);
 
     let alpha = -Infinity;
     let beta = Infinity;
-    moves.forEach((move) => {
-      const clone = game.getSameIdClone();
-      clone.move(move.pieceId, move.move);
 
-      const val = this.minVal(clone, this.depth - 1, alpha, beta);
+    for (const move of moves) {
+      const state = game.saveState();
+      game.move(move.pieceId, move.move);
+      const val = this.minVal(game, this.depth - 1, alpha, beta);
+      game.restoreState(state);
 
       if (val > bestVal) {
         bestVal = val;
@@ -53,14 +58,9 @@ export class MinimaxSolver {
       }
 
       alpha = Math.max(alpha, bestVal);
-    });
-
-    if (!bestMove) {
-      return null;
     }
 
-    const end = Date.now();
-    console.log(`Time taken: ${end - start}ms`);
+    console.log("Time taken: ", Date.now() - start);
 
     return bestMove;
   }
@@ -73,15 +73,17 @@ export class MinimaxSolver {
     let val = -Infinity;
     const moves = this._currentValidMovesEvaled(game);
 
-    for (const move of moves) {
-      const clone = game.getSameIdClone();
-      clone.move(move.pieceId, move.move);
-      val = Math.max(val, this.minVal(clone, depth - 1, alpha, beta));
+    for (const move of moves) { 
+      const state = game.saveState();
+      game.move(move.pieceId, move.move);
+      val = Math.max(val, this.minVal(game, depth - 1, alpha, beta));
+      game.restoreState(state);
       alpha = Math.max(alpha, val);
 
       if (alpha >= beta) {
         break;
       }
+
     }
     return val;
   }
@@ -96,20 +98,25 @@ export class MinimaxSolver {
     const moves = this._currentValidMovesEvaled(game);
 
     for (const move of moves) {
-      const clone = game.getSameIdClone();
-      clone.move(move.pieceId, move.move);
-      val = Math.min(val, this.maxVal(clone, depth - 1, alpha, beta));
+      const state = game.saveState();
+      game.move(move.pieceId, move.move);
+      val = Math.min(val, this.maxVal(game, depth - 1, alpha, beta));
+      game.restoreState(state);
       beta = Math.min(beta, val);
 
       if (alpha >= beta) {
         break;
       }
     }
+
     return val;
   }
 
+
+
   evaluate(game) {
     let score = 0;
+
 
     if (game.isOver) {
       if (game.winner === game.player2) {
@@ -118,32 +125,33 @@ export class MinimaxSolver {
         return -Infinity;
       }
     }
-    
+
     game.player2.pieces.forEach((piece) => {
-      score += this.AIEvalMatrix[piece.position.x][piece.position.y];
+      score += this.AIEvalMatrix[piece.x][piece.y];
     });
     
     game.player1.pieces.forEach((piece) => {
-      score += this.personEvalMatrix[piece.position.x][piece.position.y];
+      score += this.personEvalMatrix[piece.x][piece.y];
     });
-    
-    const BLOCK_BONUS = (i) =>  5 * (this.gameSize - i) * (this.gameSize - 2); // so for 4x4 board (or 3x3 game), 5 * 4 * 2 = 40
+
+    const BLOCK_BONUS = (i) => 5 * (this.boardSize - i) * (this.boardSize - 2); // so for 4x4 board (or 3x3 game), 5 * 4 * 2 = 40
     
     game.player1.pieces.forEach((personPiece) => {
-      const { x: xP, y: yP } = personPiece.position;
+      const xP = personPiece.x;
+      const yP = personPiece.y;
 
-      for (let i = 1; i <= game.gameSize - 1; i++) { 
+      for (let i = 1; i <= game.boardSize - 1; i++) { 
         const playerBlockAi = { x: xP, y: yP - i };
         const aiBlockPlayer = { x: xP - i, y: yP };
 
         if (game._isInBoard(playerBlockAi.x, playerBlockAi.y)) {
-          if (game.player2.pieces.find(piece => piece.position.x === playerBlockAi.x && piece.position.y === playerBlockAi.y) !== undefined) {
+          if (game.player2.pieces.find(piece => piece.x === playerBlockAi.x && piece.y === playerBlockAi.y) !== undefined) {
             score -= BLOCK_BONUS(i - 1);
           }
         }
 
         if (game._isInBoard(aiBlockPlayer.x, aiBlockPlayer.y )) {
-          if (game.player1.pieces.find(piece => piece.position.x === aiBlockPlayer.x && piece.position.y === aiBlockPlayer.y) !== undefined) {
+          if (game.player1.pieces.find(piece => piece.x === aiBlockPlayer.x && piece.y === aiBlockPlayer.y) !== undefined) {
             score += BLOCK_BONUS(i - 1);
           }          
         }
@@ -151,6 +159,7 @@ export class MinimaxSolver {
     });
     return score;
   }
+
 }
 
 export function aiMatrixGenerator(size) {
@@ -183,7 +192,7 @@ export function personEvalMatrix(size) {
 
   return matrix;
 }
-
+/* 
 const game = new Game(3, new Player("player1"), new Player("player2"));
 
 const solver = new MinimaxSolver(4, 10);
@@ -205,4 +214,4 @@ console.log("\n--------------------\n")
 const bestMove2 = solver.getBestMove(game);
 game.move(bestMove2.pieceId, bestMove2.move);
 game._displayBoard();
-console.log("\n--------------------\n")
+console.log("\n--------------------\n") */
