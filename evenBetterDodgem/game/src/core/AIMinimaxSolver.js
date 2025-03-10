@@ -165,7 +165,7 @@ export default class MinimaxSolver {
 export function aiMatrixGenerator(size) {
   const matrix = Array(size)
     .fill(null)
-    .map(() => Array(size).fill(50 * size * size));
+    .map(() => Array(size).fill(50 * size * (size - 1)));
   const buffer = 5 * (size - 1);
 
   for (let i = 1; i < size; i++) {
@@ -180,7 +180,7 @@ export function aiMatrixGenerator(size) {
 export function personEvalMatrix(size) {
   const matrix = Array(size)
     .fill(null)
-    .map(() => Array(size).fill(-50 * size * size));
+    .map(() => Array(size).fill(-50 * size * (size - 1)));
   const buffer = 5 * (size - 1);
 
   for (let i = 1; i < size; i++) {
